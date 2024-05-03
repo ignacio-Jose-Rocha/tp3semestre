@@ -1,4 +1,4 @@
-import mysql.connector
+import psycopg2
 import re
 
 class Contacto:
@@ -14,11 +14,11 @@ class Contacto:
 class Agenda:
     def __init__(self):
         self.contactos = []
-        self.db_connection = mysql.connector.connect(
-            host="127.0.0.1",
-            user="root",
-            password="ignacio",
-            database="agenda_contactos"
+        self.db_connection = psycopg2.connect(
+            host="aws-0-us-west-1.pooler.supabase.com",
+            user="postgres.oboahpaeidchkchctbyh",
+            password="Michi19975@@1234",
+            database="postgres"
         )
         self.cursor = self.db_connection.cursor()
 
@@ -119,7 +119,7 @@ class Agenda:
 
     def guardar_agenda_db(self, contacto):
         query = "INSERT INTO contactos (nombre, telefono, email, favorito) VALUES (%s, %s, %s, %s)"
-        values = (contacto.nombre, contacto.telefono, contacto.email, int(contacto.favorito))
+        values = (contacto.nombre, contacto.telefono, contacto.email, contacto.favorito)
         self.cursor.execute(query, values)
         self.db_connection.commit()
 
@@ -131,7 +131,7 @@ class Agenda:
 
     def editar_contacto_db(self, contacto):
         query = "UPDATE contactos SET telefono = %s, email = %s, favorito = %s WHERE nombre = %s"
-        values = (contacto.telefono, contacto.email, int(contacto.favorito), contacto.nombre)
+        values = (contacto.telefono, contacto.email, contacto.favorito, contacto.nombre)
         self.cursor.execute(query, values)
         self.db_connection.commit()
 
@@ -140,7 +140,7 @@ class Agenda:
         self.cursor.execute(query)
         for nombre, telefono, email, favorito in self.cursor.fetchall():
             contacto = Contacto(nombre, telefono, email)
-            contacto.favorito = bool(favorito)
+            contacto.favorito = favorito
             self.contactos.append(contacto)
 
 def menu():
